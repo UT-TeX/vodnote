@@ -1,0 +1,99 @@
+%%%依存するパッケージの読込
+\usepackage{tikz}
+\usepackage{zref}
+\usepackage{zref-savepos}
+\usepackage{fp}
+
+%%%ユーザーが指定できるパラメーター
+\newdimen\noteLineWidth
+\newdimen\dotsRadius
+\newdimen\noteLineDistance
+
+\noteLineWidth.5truept\relax%    <- 罫線の太さ
+\dotsRadius.8truept\relax%       <- ドットの半径
+\noteLineDistance=6truemm\relax% <- 罫線間隔（A罫 : 7truemm，B罫 : 6truemm） 
+
+
+%%%必要な内部レジスタの用意
+\newdimen\VDNT@currentXPos
+\newdimen\VDNT@currentYPos
+\newdimen\VDNT@Xinterval
+\newdimen\VDNT@Yinterval
+\newdimen\VDNT@notegoal
+
+
+%%% \notefillで用いる座標管理用カウンタの準備
+\def\VDNT@pkgname{vodnote}
+\global\newcount\VDNT@uniqe
+
+
+%%% \notefill の定義
+\newcommand{\notefill}{\par\bgroup
+  \parindent\z@
+  %%罫線間隔の算出
+  \@tempcnta\linewidth
+  \@tempcntb\noteLineDistance
+  \FPeval\VDNT@dotsNum{round(round(((\the)\@tempcnta/(\the)\@tempcntb)/2:0)*2:0)}%
+  \VDNT@Xinterval\dimexpr(\linewidth)/\VDNT@dotsNum\relax
+  \VDNT@Yinterval\VDNT@Xinterval
+  %%上端の座標取得
+  \zsaveposy{\VDNT@pkgname.\the\VDNT@uniqe.TopPos}%
+  %%下端の座標取得
+  \leavevmode\vfill\leavevmode
+  \zsaveposy{\VDNT@pkgname.\the\VDNT@uniqe.BottomPos}%
+  %%ノート罫線描画幅の決定
+  \VDNT@notegoal=\dimexpr
+    \zposy{\VDNT@pkgname.\the\VDNT@uniqe.TopPos}sp
+    -\zposy{\VDNT@pkgname.\the\VDNT@uniqe.BottomPos}sp
+  \relax
+  %%ノート罫線描画
+  \noindent\smash{%
+    \begin{tikzpicture}
+      \VDNT@currentYPos\z@
+      \fill[white!70!black] (\VDNT@Xinterval*\VDNT@dotsNum/2,\VDNT@currentYPos+\inv@mag*4pt) -- ++(\inv@mag*3pt,-\inv@mag*4pt) -- ++(-\inv@mag*6pt,0) -- cycle;
+      \@whiledim\VDNT@currentYPos<\VDNT@notegoal\do{
+        \VDNT@currentXPos\z@
+        \draw[white!70!black,line width=\noteLineWidth] (0,\VDNT@currentYPos) -- (\linewidth,\VDNT@currentYPos);
+        \foreach \k in{0,1,...,\VDNT@dotsNum}{%
+          \VDNT@currentXPos=\dimexpr\VDNT@Xinterval*\k\relax
+          \fill[white!70!black] (\VDNT@currentXPos,\VDNT@currentYPos) circle [radius=\dotsRadius];
+        }
+        \advance\VDNT@currentYPos\VDNT@Yinterval\relax
+      }
+      \fill[white!70!black] (\VDNT@Xinterval*\VDNT@dotsNum/2,\VDNT@currentYPos-\VDNT@Yinterval-\inv@mag*4pt) -- ++(\inv@mag*3pt,\inv@mag*4pt) -- ++(-\inv@mag*6pt,0) -- cycle;
+    \end{tikzpicture}%
+  }%
+  \egroup
+  %%座標管理用カウンタのインクリメント
+  \global\advance\VDNT@uniqe\@ne
+  \par
+}
+
+
+%%% \note の定義
+\newcommand{\note}[1]{\par\bgroup
+  %%罫線間隔の算出
+  \@tempcnta\linewidth
+  \@tempcntb\noteLineDistance
+  \FPeval\VDNT@dotsNum{round(round(((\the)\@tempcnta/(\the)\@tempcntb)/2:0)*2:0)}%
+  \VDNT@Xinterval\dimexpr\linewidth/\VDNT@dotsNum\relax
+  \VDNT@Yinterval\VDNT@Xinterval
+  %%ノート罫線描画
+  \noindent
+    \begin{tikzpicture}
+      \VDNT@currentYPos\z@
+      \fill[white!70!black] (\VDNT@Xinterval*\VDNT@dotsNum/2,\VDNT@currentYPos+\VDNT@Yinterval+\inv@mag*4pt) -- ++(\inv@mag*3pt,-\inv@mag*4pt) -- ++(-\inv@mag*6pt,0) -- cycle;
+      \foreach \i in{1,2,...,#1}{
+        \VDNT@currentXPos\z@
+        \global\VDNT@currentYPos=\dimexpr\VDNT@Yinterval*\i\relax
+        \draw[white!70!black,line width=\noteLineWidth] (0,\VDNT@currentYPos) -- (\linewidth,\VDNT@currentYPos);
+        \foreach \k in{0,1,...,\VDNT@dotsNum}{
+          \VDNT@currentXPos=\dimexpr\VDNT@Xinterval*\k\relax
+          \fill[white!70!black] (\VDNT@currentXPos,\VDNT@currentYPos) circle [radius=\dotsRadius];
+        }
+      }
+      \fill[white!70!black] (\VDNT@Xinterval*\VDNT@dotsNum/2,\VDNT@currentYPos-\inv@mag*4pt) -- ++(\inv@mag*3pt,\inv@mag*4pt) -- ++(-\inv@mag*6pt,0) -- cycle;
+    \end{tikzpicture}%
+  \egroup
+  \par
+}
