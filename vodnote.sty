@@ -1,6 +1,16 @@
-\NeedsTeXFormat{LaTeX2e}
+\NeedsTeXFormat{pLaTeX2e}
 \ProvidesPackage{vodnote}[2018/06/29, VoD]
 \RequirePackage{tikz,zref,zref-savepos,fp}
+
+\newcommand{\VDNT@classloaded}{%
+  \PackageError{vodnote}
+  {vodnote should be used on jsclasses.}
+  {Any issues are accepted on https://github.com/UT-TeX/vodnote/issues/new}
+
+}
+\@ifclassloaded{jsarticle}{\relax}{\VDNT@classloaded}
+\@ifclassloaded{jsbook}{\relax}{\VDNT@classloaded}
+\@ifclassloaded{jsreport}{\relax}{\VDNT@classloaded}
 
 %%%ユーザーが指定できるパラメーター
 \newdimen\noteLineWidth
@@ -49,7 +59,7 @@
     \begin{tikzpicture}
       \VDNT@currentYPos\z@
       \fill[white!70!black] (\VDNT@Xinterval*\VDNT@dotsNum/2,\VDNT@currentYPos+\inv@mag*4pt) -- ++(\inv@mag*3pt,-\inv@mag*4pt) -- ++(-\inv@mag*6pt,0) -- cycle;
-      \@whiledim\VDNT@currentYPos<\VDNT@notegoal\do{
+      \@whiledim\VDNT@currentYPos<\VDNT@notegoal\do{%
         \VDNT@currentXPos\z@
         \draw[white!70!black,line width=\noteLineWidth] (0,\VDNT@currentYPos) -- (\linewidth,\VDNT@currentYPos);
         \foreach \k in{0,1,...,\VDNT@dotsNum}{%
