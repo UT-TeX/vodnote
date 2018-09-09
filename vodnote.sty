@@ -2,16 +2,6 @@
 \ProvidesPackage{vodnote}[2018/06/29, VoD]
 \RequirePackage{tikz,zref,zref-savepos,fp}
 
-\newcommand{\VDNT@classloaded}{%
-  \PackageError{vodnote}
-  {vodnote should be used on jsclasses.}
-  {Any issues are accepted on https://github.com/UT-TeX/vodnote/issues/new}
-
-}
-\@ifclassloaded{jsarticle}{\relax}{\VDNT@classloaded}
-\@ifclassloaded{jsbook}{\relax}{\VDNT@classloaded}
-\@ifclassloaded{jsreport}{\relax}{\VDNT@classloaded}
-
 %%%ユーザーが指定できるパラメーター
 \newdimen\noteLineWidth
 \newdimen\dotsRadius
