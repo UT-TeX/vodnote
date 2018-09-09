@@ -1,6 +1,11 @@
 \NeedsTeXFormat{pLaTeX2e}
 \ProvidesPackage{vodnote}[2018/06/29, VoD]
-\RequirePackage{tikz,zref,zref-savepos,fp}
+\RequirePackage{tikz,zref,zref-savepos}
+\RequirePackage[nomessages]{fp}
+
+\ifdefined\inv@mag\else
+  \FPdiv\inv@mag{1000}{\the\mag}
+\fi
 
 %%%ユーザーが指定できるパラメーター
 \newdimen\noteLineWidth
